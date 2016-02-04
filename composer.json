@@ -1,0 +1,16 @@
+{
+    "name": "danielbachhuber/wp-hook-command",
+    "description": "List callbacks registered to a given action or filter",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Daniel Bachhuber",
+            "email": "daniel@handbuilt.co"
+        }
+    ],
+    "minimum-stability": "dev",
+    "require": {},
+    "require-dev": {
+        "behat/behat": "~2.5"
+    }
+}
