@@ -1,6 +1,6 @@
 {
-    "name": "danielbachhuber/wp-hook-command",
-    "description": "List callbacks registered to a given action or filter",
+    "name": "runcommand/hook",
+    "description": "List callbacks registered to a given action or filter.",
     "license": "MIT",
     "authors": [
         {
@@ -12,5 +12,10 @@
     "require": {},
     "require-dev": {
         "behat/behat": "~2.5"
+    },
+    "extras": {
+        "commands": [
+            "hook"
+        ]
     }
 }
