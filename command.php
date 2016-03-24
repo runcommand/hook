@@ -1,5 +1,9 @@
 <?php
 
+if ( ! class_exists( 'WP_CLI' ) ) {
+	return;
+}
+
 $hook_command = function( $args, $assoc_args ) {
 	global $wp_filter;
 
