@@ -3,6 +3,7 @@ runcommand/hook
 
 List callbacks registered to a given action or filter.
 
+[![Build Status](https://travis-ci.org/runcommand/hook.svg?branch=master)](https://travis-ci.org/runcommand/hook)
 
 Quick links: [Using](#using) | [Installing](#installing) | [Contributing](#contributing)
 
