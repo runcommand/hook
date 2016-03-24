@@ -11,14 +11,22 @@ Quick links: [Using](#using) | [Installing](#installing) | [Contributing](#contr
 
 
 ~~~
-wp hook 
+wp hook <hook> [--format=<format>]
 ~~~
+
+**OPTIONS**
+
+	<hook>
+		The key for the action or filter.
+
+	[--format=<format>]
+		List callbacks as a table, JSON, or CSV. Default: table.
 
 
 
 ## Installing
 
-This package requires the latest nightly version of WP-CLI. Update with `wp cli update --nightly`.
+Installing this package requires WP-CLI v0.23.0 or greater. Update to the latest stable release with `wp cli update`.
 
 Once you've done so, you can install this package with `wp package install runcommand/hook`
 
