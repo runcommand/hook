@@ -5,7 +5,9 @@
     "authors": [
         {
             "name": "Daniel Bachhuber",
-            "email": "daniel@handbuilt.co"
+            "email": "daniel@handbuilt.co",
+            "homepage": "http://runcommand.io",
+            "role": "Developer"
         }
     ],
     "minimum-stability": "dev",
