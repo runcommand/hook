@@ -51,7 +51,10 @@ $hook_command = function( $args, $assoc_args ) {
 		foreach( $callbacks as $callback ) {
 			if ( is_array( $callback['function'] ) && is_object( $callback['function'][0] ) ) {
 				$callback['function'] = get_class( $callback['function'][0] ) . '->' . $callback['function'][1];
+			} elseif ( is_array( $callback['function'] ) && method_exists( $callback['function'][0], $callback['function'][1] ) ) {
+				$callback['function'] = $callback['function'][0] . '::' . $callback['function'][1];
 			}
+
 			$callbacks_output[] = array(
 				'function'        => $callback['function'],
 				'priority'        => $priority,
