@@ -14,13 +14,32 @@ Quick links: [Using](#using) | [Installing](#installing) | [Contributing](#contr
 wp hook <hook> [--format=<format>]
 ~~~
 
+```
+wp hook wp_enqueue_scripts
++---------------------------------------------+----------+---------------+
+| function                                    | priority | accepted_args |
++---------------------------------------------+----------+---------------+
+| simpleDownloadManager->sdm_frontend_scripts | 10       | 1             |
+| biker_enqueue_styles                        | 10       | 1             |
+| jolene_scripts_styles                       | 10       | 1             |
+| rest_register_scripts                       | -100     | 1             |
++---------------------------------------------+----------+---------------+
+```
 **OPTIONS**
 
 	<hook>
-		The key for the action or filter.
+		The name of the action or filter.
 
 	[--format=<format>]
-		List callbacks as a table, JSON, or CSV. Default: table.
+		List callbacks as a table, JSON, CSV, or YAML.
+		---
+		default: table
+		options:
+		  - table
+		  - json
+		  - csv
+		  - yaml
+		---
 
 
 
