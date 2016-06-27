@@ -1,13 +1,13 @@
 {
     "name": "runcommand/hook",
     "description": "List callbacks registered to a given action or filter.",
+    "homepage": "https://runcommand.io/wp/hook/",
     "license": "MIT",
     "authors": [
         {
             "name": "Daniel Bachhuber",
-            "email": "daniel@handbuilt.co",
-            "homepage": "http://runcommand.io",
-            "role": "Developer"
+            "email": "daniel@runcommand.io",
+            "homepage": "https://runcommand.io"
         }
     ],
     "minimum-stability": "dev",
