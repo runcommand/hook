@@ -62,6 +62,7 @@ $hook_command = function( $args, $assoc_args ) {
 				);
 		}
 	}
+	$callbacks_output = array_reverse( $callbacks_output );
 	WP_CLI\Utils\format_items( $assoc_args['format'], $callbacks_output, array( 'function', 'priority', 'accepted_args' ) );
 };
 
