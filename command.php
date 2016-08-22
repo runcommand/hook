@@ -53,6 +53,8 @@ $hook_command = function( $args, $assoc_args ) {
 				$callback['function'] = get_class( $callback['function'][0] ) . '->' . $callback['function'][1];
 			} elseif ( is_array( $callback['function'] ) && method_exists( $callback['function'][0], $callback['function'][1] ) ) {
 				$callback['function'] = $callback['function'][0] . '::' . $callback['function'][1];
+			} elseif ( is_object( $callback['function'] ) && is_a( $callback['function'], 'Closure' ) ) {
+				$callback['function'] = 'function(){}';
 			}
 
 			$callbacks_output[] = array(
