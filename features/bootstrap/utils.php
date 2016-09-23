@@ -332,18 +332,36 @@ function pick_fields( $item, $fields ) {
 }
 
 /**
- * Launch system's $EDITOR to edit text
+ * Launch system's $EDITOR for the user to edit some text.
  *
- * @param  str  $content  Text to edit (eg post content)
- * @return str|bool       Edited text, if file is saved from editor
- *                        False, if no change to file
+ * @access public
+ * @category Input
+ *
+ * @param  string  $content  Some form of text to edit (e.g. post content)
+ * @return string|bool       Edited text, if file is saved from editor; false, if no change to file.
  */
-function launch_editor_for_input( $input, $title = 'WP-CLI' ) {
+function launch_editor_for_input( $input, $filename = 'WP-CLI' ) {
 
-	$tmpfile = wp_tempnam( $title );
+	$tmpdir = get_temp_dir();
 
-	if ( !$tmpfile )
+	do {
+		$tmpfile = basename( $filename );
+		$tmpfile = preg_replace( '|\.[^.]*$|', '', $tmpfile );
+		$tmpfile .= '-' . substr( md5( rand() ), 0, 6 );
+		$tmpfile = $tmpdir . $tmpfile . '.tmp';
+		$fp = @fopen( $tmpfile, 'x' );
+		if ( ! $fp && is_writable( $tmpdir ) && file_exists( $tmpfile ) ) {
+			$tmpfile = '';
+			continue;
+		}
+		if ( $fp ) {
+			fclose( $fp );
+		}
+	} while( ! $tmpfile );
+
+	if ( ! $tmpfile ) {
 		\WP_CLI::error( 'Error creating temporary file.' );
+	}
 
 	$output = '';
 	file_put_contents( $tmpfile, $input );
@@ -429,7 +447,7 @@ function run_mysql_command( $cmd, $assoc_args, $descriptors = null ) {
  *
  * IMPORTANT: Automatic HTML escaping is disabled!
  */
-function mustache_render( $template_name, $data ) {
+function mustache_render( $template_name, $data = array() ) {
 	if ( ! file_exists( $template_name ) )
 		$template_name = WP_CLI_ROOT . "/templates/$template_name";
 
@@ -638,9 +656,16 @@ function get_named_sem_ver( $new_version, $original_version ) {
 	}
 
 	$parts = explode( '-', $original_version );
-	list( $major, $minor, $patch ) = explode( '.', $parts[0] );
+	$bits = explode( '.', $parts[0] );
+	$major = $bits[0];
+	if ( isset( $bits[1] ) ) {
+		$minor = $bits[1];
+	}
+	if ( isset( $bits[2] ) ) {
+		$patch = $bits[2];
+	}
 
-	if ( Semver::satisfies( $new_version, "{$major}.{$minor}.x" ) ) {
+	if ( ! is_null( $minor ) && Semver::satisfies( $new_version, "{$major}.{$minor}.x" ) ) {
 		return 'patch';
 	} else if ( Semver::satisfies( $new_version, "{$major}.x.x" ) ) {
 		return 'minor';
@@ -695,8 +720,45 @@ function get_temp_dir() {
 	}
 
 	if ( ! @is_writable( $temp ) ) {
-		WP_CLI::warning( "Temp directory isn't writable: {$temp}" );
+		\WP_CLI::warning( "Temp directory isn't writable: {$temp}" );
 	}
 
 	return $trailingslashit( $temp );
+}
+
+/**
+ * Parse a SSH url for its host, port, and path.
+ *
+ * Similar to parse_url(), but adds support for defined SSH aliases.
+ *
+ * ```
+ * host OR host/path/to/wordpress OR host:port/path/to/wordpress
+ * ```
+ *
+ * @access public
+ *
+ * @return mixed
+ */
+function parse_ssh_url( $url, $component = -1 ) {
+	preg_match( '#^([^:/~]+)(:([\d]+))?((/|~)(.+))?$#', $url, $matches );
+	$bits = array();
+	foreach( array(
+		1 => 'host',
+		3 => 'port',
+		4 => 'path',
+	) as $i => $key ) {
+		if ( ! empty( $matches[ $i ] ) ) {
+			$bits[ $key ] = $matches[ $i ];
+		}
+	}
+	switch ( $component ) {
+		case PHP_URL_HOST:
+			return isset( $bits['host'] ) ? $bits['host'] : null;
+		case PHP_URL_PATH:
+			return isset( $bits['path'] ) ? $bits['path'] : null;
+		case PHP_URL_PORT:
+			return isset( $bits['port'] ) ? $bits['port'] : null;
+		default:
+			return $bits;
+	}
 }
