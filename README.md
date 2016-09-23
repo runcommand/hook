@@ -10,24 +10,26 @@ Quick links: [Using](#using) | [Installing](#installing) | [Support](#support)
 ## Using
 
 ~~~
-wp hook <hook> [--format=<format>]
+wp hook <hook> [--fields=<fields>] [--format=<format>]
 ~~~
 
 ```
-wp hook wp_enqueue_scripts
-+---------------------------------------------+----------+---------------+
-| function                                    | priority | accepted_args |
-+---------------------------------------------+----------+---------------+
-| simpleDownloadManager->sdm_frontend_scripts | 10       | 1             |
-| biker_enqueue_styles                        | 10       | 1             |
-| jolene_scripts_styles                       | 10       | 1             |
-| rest_register_scripts                       | -100     | 1             |
-+---------------------------------------------+----------+---------------+
+wp hook wp_enqueue_scripts --fields=callback,location
++------------------------------------------------+---------------------------------------------+
+| callback                                       | location                                    |
++------------------------------------------------+---------------------------------------------+
+| wp_localize_jquery_ui_datepicker()             | wp-includes/script-loader.php:928           |
+| rest_register_scripts()                        | runcommand-theme/lib/rest-api/extras.php:22 |
+| runcommand\Assets->action_wp_enqueue_scripts() | runcommand-theme/inc/class-assets.php:21    |
++------------------------------------------------+---------------------------------------------+
 ```
 **OPTIONS**
 
 	<hook>
 		The name of the action or filter.
+
+	[--fields=<fields>]
+		Limit the output to specific fields. Defaults to all fields.
 
 	[--format=<format>]
 		List callbacks as a table, JSON, CSV, or YAML.
@@ -39,6 +41,15 @@ wp hook wp_enqueue_scripts
 		  - csv
 		  - yaml
 		---
+
+**AVAILABLE FIELDS**
+
+These fields are displayed by default for each callback:
+
+* callback - a human-friendly name for the callback
+* location - where the callback is defined in the codebase
+* priority - order in which the callback will be executed
+* accepted_args - number of arguments to be passed to the callback
 
 ## Installing
 

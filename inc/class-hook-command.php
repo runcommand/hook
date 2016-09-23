@@ -11,15 +11,14 @@ class Hook_Command {
 	 * List callbacks registered to a given action or filter.
 	 *
 	 * ```
-	 * wp hook wp_enqueue_scripts
-	 * +---------------------------------------------+----------+---------------+
-	 * | function                                    | priority | accepted_args |
-	 * +---------------------------------------------+----------+---------------+
-	 * | simpleDownloadManager->sdm_frontend_scripts | 10       | 1             |
-	 * | biker_enqueue_styles                        | 10       | 1             |
-	 * | jolene_scripts_styles                       | 10       | 1             |
-	 * | rest_register_scripts                       | -100     | 1             |
-	 * +---------------------------------------------+----------+---------------+
+	 * wp hook wp_enqueue_scripts --fields=callback,location
+	 * +------------------------------------------------+---------------------------------------------+
+	 * | callback                                       | location                                    |
+	 * +------------------------------------------------+---------------------------------------------+
+	 * | wp_localize_jquery_ui_datepicker()             | wp-includes/script-loader.php:928           |
+	 * | rest_register_scripts()                        | runcommand-theme/lib/rest-api/extras.php:22 |
+	 * | runcommand\Assets->action_wp_enqueue_scripts() | runcommand-theme/inc/class-assets.php:21    |
+	 * +------------------------------------------------+---------------------------------------------+
 	 * ```
 	 * ## OPTIONS
 	 *
