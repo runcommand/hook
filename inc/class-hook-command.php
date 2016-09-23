@@ -62,7 +62,6 @@ class Hook_Command {
 					);
 			}
 		}
-		$callbacks_output = array_reverse( $callbacks_output );
 		Utils\format_items( $assoc_args['format'], $callbacks_output, array( 'callback', 'location', 'priority', 'accepted_args' ) );
 	}
 
