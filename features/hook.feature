@@ -1,5 +1,14 @@
 Feature: List callbacks registered to a given action or filter.
 
+  Scenario: Invalid hook
+    Given a WP install
+
+    When I try `wp hook foobarinvalid`
+    Then STDERR should be:
+      """
+      Error: No callbacks specified for 'foobarinvalid'.
+      """
+
   Scenario: Hook command loads
     Given a WP install
 
