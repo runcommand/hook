@@ -46,7 +46,7 @@ class Hook_Command {
 
 		$hook = $args[0];
 		if ( ! isset( $wp_filter[ $hook ] ) ) {
-			WP_CLI::error( "No callbacks specified for {$hook}." );
+			WP_CLI::error( "No callbacks specified for '{$hook}'." );
 		}
 
 		$callbacks_output = array();
