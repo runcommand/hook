@@ -12,6 +12,7 @@ use \WP_CLI\Utils;
 if ( file_exists( __DIR__ . '/utils.php' ) ) {
 	require_once __DIR__ . '/utils.php';
 	require_once __DIR__ . '/Process.php';
+	require_once __DIR__ . '/ProcessRun.php';
 	$project_composer = dirname( dirname( dirname( __FILE__ ) ) ) . '/composer.json';
 	if ( file_exists( $project_composer ) ) {
 		$composer = json_decode( file_get_contents( $project_composer ) );
@@ -30,6 +31,8 @@ if ( file_exists( __DIR__ . '/utils.php' ) ) {
 } else {
 	require_once __DIR__ . '/../../php/utils.php';
 	require_once __DIR__ . '/../../php/WP_CLI/Process.php';
+	require_once __DIR__ . '/../../php/WP_CLI/ProcessRun.php';
+	require_once __DIR__ . '/../../vendor/autoload.php';
 }
 
 /**
@@ -77,6 +80,9 @@ class FeatureContext extends BehatContext implements ClosuredContextInterface {
 			return;
 
 		$cmd = Utils\esc_cmd( 'wp core download --force --path=%s', self::$cache_dir );
+		if ( getenv( 'WP_VERSION' ) ) {
+			$cmd .= Utils\esc_cmd( ' --version=%s', getenv( 'WP_VERSION' ) );
+		}
 		Process::create( $cmd, null, self::get_process_env_variables() )->run_check();
 	}
 
@@ -84,7 +90,14 @@ class FeatureContext extends BehatContext implements ClosuredContextInterface {
 	 * @BeforeSuite
 	 */
 	public static function prepare( SuiteEvent $event ) {
+		$result = Process::create( 'wp cli info', null, self::get_process_env_variables() )->run_check();
+		echo PHP_EOL;
+		echo $result->stdout;
+		echo PHP_EOL;
 		self::cache_wp_files();
+		$result = Process::create( Utils\esc_cmd( 'wp core version --path=%s', self::$cache_dir ) , null, self::get_process_env_variables() )->run_check();
+		echo 'WordPress ' . $result->stdout;
+		echo PHP_EOL;
 	}
 
 	/**
@@ -112,6 +125,11 @@ class FeatureContext extends BehatContext implements ClosuredContextInterface {
 			if ( $event->getResult() < 4 ) {
 				$this->proc( Utils\esc_cmd( 'rm -r %s', $this->variables['RUN_DIR'] ) )->run();
 			}
+		}
+
+		// Remove WP-CLI package directory
+		if ( isset( $this->variables['PACKAGE_PATH'] ) ) {
+			$this->proc( Utils\esc_cmd( 'rm -rf %s', $this->variables['PACKAGE_PATH'] ) )->run();
 		}
 
 		foreach ( $this->running_procs as $proc ) {

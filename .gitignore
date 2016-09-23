@@ -1,4 +1,4 @@
-composer.lock
 .DS_Store
-/vendor
 wp-cli.local.yml
+node_modules/
+vendor/
