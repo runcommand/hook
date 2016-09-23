@@ -52,23 +52,52 @@ class Hook_Command {
 		$callbacks_output = array();
 		foreach( $wp_filter[ $hook ] as $priority => $callbacks ) {
 			foreach( $callbacks as $callback ) {
-				if ( is_array( $callback['function'] ) && is_object( $callback['function'][0] ) ) {
-					$callback['function'] = get_class( $callback['function'][0] ) . '->' . $callback['function'][1];
-				} elseif ( is_array( $callback['function'] ) && method_exists( $callback['function'][0], $callback['function'][1] ) ) {
-					$callback['function'] = $callback['function'][0] . '::' . $callback['function'][1];
-				} elseif ( is_object( $callback['function'] ) && is_a( $callback['function'], 'Closure' ) ) {
-					$callback['function'] = 'function(){}';
-				}
+				list( $name, $location ) = self::get_name_location_from_callback( $callback['function'] );
 
 				$callbacks_output[] = array(
-					'function'        => $callback['function'],
+					'callback'        => $name,
+					'location'        => $location,
 					'priority'        => $priority,
 					'accepted_args'   => $callback['accepted_args'],
 					);
 			}
 		}
 		$callbacks_output = array_reverse( $callbacks_output );
-		Utils\format_items( $assoc_args['format'], $callbacks_output, array( 'function', 'priority', 'accepted_args' ) );
+		Utils\format_items( $assoc_args['format'], $callbacks_output, array( 'callback', 'location', 'priority', 'accepted_args' ) );
+	}
+
+	/**
+	 * Get a human-readable name from a callback
+	 */
+	private static function get_name_location_from_callback( $callback ) {
+		$name = $location = '';
+		$reflection = false;
+		if ( is_array( $callback ) && is_object( $callback[0] ) ) {
+			$reflection = new \ReflectionMethod( $callback[0], $callback[1] );
+			$name = get_class( $callback[0] ) . '->' . $callback[1] . '()';
+		} elseif ( is_array( $callback ) && method_exists( $callback[0], $callback[1] ) ) {
+			$reflection = new \ReflectionMethod( $callback[0], $callback[1] );
+			$name = $callback[0] . '::' . $callback[1] . '()';
+		} elseif ( is_object( $callback ) && is_a( $callback, 'Closure' ) ) {
+			$reflection = new \ReflectionFunction( $callback );
+			$name = 'function(){}';
+		} else if ( is_string( $callback ) ) {
+			$reflection = new \ReflectionFunction( $callback );
+			$name = $callback . '()';
+		}
+		if ( $reflection ) {
+			$location = $reflection->getFileName() . ':' . $reflection->getStartLine();
+			if ( 0 === stripos( $location, WP_PLUGIN_DIR ) ) {
+				$location = str_replace( trailingslashit( WP_PLUGIN_DIR ), '', $location );
+			} else if ( 0 === stripos( $location, get_theme_root() ) ) {
+				$location = str_replace( trailingslashit( get_theme_root() ), '', $location );
+			} else if ( 0 === stripos( $location, ABSPATH . 'wp-admin/' ) ) {
+				$location = str_replace( ABSPATH, '', $location );
+			} else if ( 0 === stripos( $location, ABSPATH . 'wp-includes/' ) ) {
+				$location = str_replace( ABSPATH, '', $location );
+			}
+		}
+		return array( $name, $location );
 	}
 
 }
