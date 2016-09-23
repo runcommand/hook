@@ -26,6 +26,9 @@ class Hook_Command {
 	 * <hook>
 	 * : The name of the action or filter.
 	 *
+	 * [--fields=<fields>]
+	 * : Limit the output to specific fields. Defaults to all fields.
+	 *
 	 * [--format=<format>]
 	 * : List callbacks as a table, JSON, CSV, or YAML.
 	 * ---
@@ -36,13 +39,25 @@ class Hook_Command {
 	 *   - csv
 	 *   - yaml
 	 * ---
+	 *
+	 * ## AVAILABLE FIELDS
+	 *
+	 * These fields are displayed by default for each callback:
+	 *
+	 * * callback - a human-friendly name for the callback
+	 * * location - where the callback is defined in the codebase
+	 * * priority - order in which the callback will be executed
+	 * * accepted_args - number of arguments to be passed to the callback
 	 */
 	public function __invoke( $args, $assoc_args ) {
 		global $wp_filter;
 
 		$assoc_args = array_merge( array(
 			'format'        => 'table',
+			'fields'        => 'callback,location,priority,accepted_args'
 			), $assoc_args );
+
+		$assoc_args['fields'] = explode( ',', $assoc_args['fields'] );
 
 		$hook = $args[0];
 		if ( ! isset( $wp_filter[ $hook ] ) ) {
@@ -62,7 +77,7 @@ class Hook_Command {
 					);
 			}
 		}
-		Utils\format_items( $assoc_args['format'], $callbacks_output, array( 'callback', 'location', 'priority', 'accepted_args' ) );
+		Utils\format_items( $assoc_args['format'], $callbacks_output, $assoc_args['fields'] );
 	}
 
 	/**
