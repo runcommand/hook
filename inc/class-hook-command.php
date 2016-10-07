@@ -64,7 +64,9 @@ class Hook_Command {
 		}
 
 		$callbacks_output = array();
-		foreach( $wp_filter[ $hook ] as $priority => $callbacks ) {
+		$filters = $wp_filter[ $hook ];
+		ksort( $filters );
+		foreach( $filters as $priority => $callbacks ) {
 			foreach( $callbacks as $callback ) {
 				list( $name, $location ) = self::get_name_location_from_callback( $callback['function'] );
 
