@@ -102,6 +102,8 @@ class Hook_Command {
 			$location = $reflection->getFileName() . ':' . $reflection->getStartLine();
 			if ( 0 === stripos( $location, WP_PLUGIN_DIR ) ) {
 				$location = str_replace( trailingslashit( WP_PLUGIN_DIR ), '', $location );
+			} else if ( 0 === stripos( $location, WPMU_PLUGIN_DIR ) ) {
+				$location = str_replace( trailingslashit( dirname( WPMU_PLUGIN_DIR ) ), '', $location );
 			} else if ( 0 === stripos( $location, get_theme_root() ) ) {
 				$location = str_replace( trailingslashit( get_theme_root() ), '', $location );
 			} else if ( 0 === stripos( $location, ABSPATH . 'wp-admin/' ) ) {
