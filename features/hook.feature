@@ -30,3 +30,19 @@ Feature: List callbacks registered to a given action or filter.
     Then STDOUT should be a table containing rows:
       | callback                   | priority  |
       | check_theme_switched()     | 99        |
+
+  Scenario: Truncate paths to mu-plugins
+    Given a WP install
+    And a wp-content/mu-plugins/custom-action.php file:
+      """
+      <?php
+      function runcommand_custom_action_hook() {
+        wp_cache_get( 'foo' );
+      }
+      add_action( 'runcommand_custom_action', 'runcommand_custom_action_hook' );
+      """
+
+    When I run `wp hook runcommand_custom_action --fields=callback,location`
+    Then STDOUT should be a table containing rows:
+      | callback                        | location                       |
+      | runcommand_custom_action_hook() | mu-plugins/custom-action.php:2 |
