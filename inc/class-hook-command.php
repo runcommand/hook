@@ -64,7 +64,11 @@ class Hook_Command {
 		}
 
 		$callbacks_output = array();
-		$filters = $wp_filter[ $hook ];
+		if ( is_a( $wp_filter[ $hook ], 'WP_Hook' ) ) {
+			$filters = $wp_filter[ $hook ]->callbacks;
+		} else {
+			$filters = $wp_filter[ $hook ];
+		}
 		ksort( $filters );
 		foreach( $filters as $priority => $callbacks ) {
 			foreach( $callbacks as $callback ) {
