@@ -103,6 +103,10 @@ class Hook_Command {
 			} elseif ( is_object( $callback ) && is_a( $callback, 'Closure' ) ) {
 				$reflection = new \ReflectionFunction( $callback );
 				$name = 'function(){}';
+			} else if ( is_string( $callback ) && false !== stripos( $callback, '::' ) ) {
+				$bits = explode( '::', $callback );
+				$reflection = new \ReflectionMethod( $bits[0], $bits[1] );
+				$name = $bits[0] . '::' . $bits[1] . '()';
 			} else if ( is_string( $callback ) ) {
 				$reflection = new \ReflectionFunction( $callback );
 				$name = $callback . '()';
