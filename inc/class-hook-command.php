@@ -2,6 +2,7 @@
 
 namespace runcommand;
 
+use Exception;
 use WP_CLI;
 use WP_CLI\Utils;
 
@@ -90,19 +91,24 @@ class Hook_Command {
 	 */
 	private static function get_name_location_from_callback( $callback ) {
 		$name = $location = '';
-		$reflection = false;
-		if ( is_array( $callback ) && is_object( $callback[0] ) ) {
-			$reflection = new \ReflectionMethod( $callback[0], $callback[1] );
-			$name = get_class( $callback[0] ) . '->' . $callback[1] . '()';
-		} elseif ( is_array( $callback ) && method_exists( $callback[0], $callback[1] ) ) {
-			$reflection = new \ReflectionMethod( $callback[0], $callback[1] );
-			$name = $callback[0] . '::' . $callback[1] . '()';
-		} elseif ( is_object( $callback ) && is_a( $callback, 'Closure' ) ) {
-			$reflection = new \ReflectionFunction( $callback );
-			$name = 'function(){}';
-		} else if ( is_string( $callback ) ) {
-			$reflection = new \ReflectionFunction( $callback );
-			$name = $callback . '()';
+			$reflection = false;
+		try {
+			$reflection = false;
+			if ( is_array( $callback ) && is_object( $callback[0] ) ) {
+				$reflection = new \ReflectionMethod( $callback[0], $callback[1] );
+				$name = get_class( $callback[0] ) . '->' . $callback[1] . '()';
+			} elseif ( is_array( $callback ) && method_exists( $callback[0], $callback[1] ) ) {
+				$reflection = new \ReflectionMethod( $callback[0], $callback[1] );
+				$name = $callback[0] . '::' . $callback[1] . '()';
+			} elseif ( is_object( $callback ) && is_a( $callback, 'Closure' ) ) {
+				$reflection = new \ReflectionFunction( $callback );
+				$name = 'function(){}';
+			} else if ( is_string( $callback ) ) {
+				$reflection = new \ReflectionFunction( $callback );
+				$name = $callback . '()';
+			}
+		} catch( Exception $e ) {
+			WP_CLI::warning( $e->getMessage() );
 		}
 		if ( $reflection ) {
 			$location = $reflection->getFileName() . ':' . $reflection->getStartLine();
